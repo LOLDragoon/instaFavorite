@@ -1,14 +1,29 @@
 let data = {} // our default object when there is no one left to delete
-let timer = 30 // our global variable for how long we need to wait, ideally this will be in storage and editable in the future
 const deletion = [] //array of usernames we need to remove from storage
 const now = Date.now() // time upon loading an instagram page
 let time = 30;
 let scale = "seconds"
+let active = true
+//short hand way to dynamically calculate for the proper unit
 let timeConversionObj = {
   seconds: 1000,
   minutes:60000,
   hours:3600000,
   days:86400000,
+}
+
+
+function getSettings(){
+  chrome.storage.sync.get({
+    InstaFavoriteTime: 30,
+    InstaFavoriteScale: "seconds",
+    InstaFavoriteActive: true
+  }, function(items) {
+    time = items.InstaFavoriteTime;
+    scale = items.InstaFavoriteScale;
+    active = items.InstaFavoriteActive;
+    console.log(time,scale,active)
+  });
 }
 
 
@@ -38,6 +53,10 @@ function generateConfirmation(message,arr)
   }
 }
 
+//acquire settings from options
+getSettings()
+
+// check if we have anyone to unfollow
 
 chrome.storage.sync.get(['users'], function(result){
   console.log("result", result)
@@ -45,7 +64,8 @@ chrome.storage.sync.get(['users'], function(result){
   let message = ''
   data = result.users
     for (const user in data) {
-      if(Math.floor((now-data[user].date)/timeConversionObj[data[user].magnitude])>=data[user].amount){ //refine for days or minutes or some sort of toggle
+      //individually parses the package of each object to compare if the proper amount of time has passed
+      if(Math.floor((now-data[user].date)/timeConversionObj[data[user].magnitude])>=data[user].amount){
         console.log(`${user} is older than ${data[user].amount}, time to delete!`)
         deletion.push(user)
         message+= `${user}\n`
@@ -65,7 +85,7 @@ document.addEventListener('mousedown',function(e){
   // console.log("first child",e.target.firstChild.nodeValue) // double redundancy to ensure we actually hit that follow button
   let className = e.target.className
   let regEx = /sqdOP*/
-  if(e.target.firstChild.nodeValue === "Follow" && className.match()){
+  if(e.target.firstChild.nodeValue === "Follow" && className.match() && active === true){
     console.log("you pressed the follow button")
     console.log("header",e.target.closest('header'))
     console.log("closest anchor",e.target.closest('header').querySelector('a').getAttribute("href"))
@@ -88,7 +108,11 @@ document.addEventListener('mousedown',function(e){
 })
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
+  let refreshSettings = false;
   for (let key in changes) {
+    if (key === "InstaFavoriteActive" || key === "InstaFavoriteScale" || key === "InstaFavoriteTime"){
+      refreshSettings = true;
+    }
     let storageChange = changes[key];
     console.log('Storage key "%s" in namespace "%s" changed. ' +
                 'Old value was "%s", new value is "%s".',
@@ -96,5 +120,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
                 namespace,
                 storageChange.oldValue,
                 storageChange.newValue);
+  }
+  if (refreshSettings){
+    getSettings()
+    refreshSettings = false
   }
 });
