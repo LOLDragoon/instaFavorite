@@ -4,6 +4,7 @@ const deletion = [] //array of usernames we need to remove from storage
 const now = Date.now() // time upon loading an instagram page
 
 
+
 function generateMessage(arr){
   let listMessage = 'Users due for unfollowing:\n'
   for(const user in arr){
@@ -51,6 +52,7 @@ chrome.storage.sync.get(['users'], function(result){
   //console.log(data)
 })
 
+
 document.addEventListener('mousedown',function(e){
   // console.log("className",e.target.className) // seems like instagram has a consistent naming schema for their follow div
   // console.log("first child",e.target.firstChild.nodeValue) // double redundancy to ensure we actually hit that follow button
@@ -75,3 +77,15 @@ document.addEventListener('mousedown',function(e){
     })
   }
 })
+
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (let key in changes) {
+    let storageChange = changes[key];
+    console.log('Storage key "%s" in namespace "%s" changed. ' +
+                'Old value was "%s", new value is "%s".',
+                key,
+                namespace,
+                storageChange.oldValue,
+                storageChange.newValue);
+  }
+});

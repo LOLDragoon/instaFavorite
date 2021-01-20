@@ -3,11 +3,15 @@
   "name" :"favoriteAndForget",
   "version": "1.0",
   "description": "Make a reminder to unfollow instagram users after a certain time",
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
   "permissions":["storage","activeTab","tabs", "*://*.instagram.com/*"],
   "content_scripts":[
     {
       "matches": [ "*://*.instagram.com/*"],
-      "js":["main.js"],
+      "js":["main.js","options.js"],
       "css":["style.css"]
     }
   ],

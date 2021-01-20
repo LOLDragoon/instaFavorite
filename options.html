@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head><title>FavoriteAndForget Options</title></head>
+  <body>
+    <label for ="active">Activate:</label>
+    <input type="checkbox" id="active">
+    <br>
+
+    <label for ="time">Reminder to unfollow in: </label>
+    <input type="number" id ="time" name = "time" min ="1" max="100">
+    <select id="scale">
+      <option value="seconds">seconds</option>
+      <option value="minutes">minutes</option>
+      <option value="hours">hours</option>
+      <option value="days">days</option>
+    </select>
+    <div id="status"></div>
+    <button id="save">Save</button>
+
+    <script src="options.js"></script>
+
+  </body>
+</html>
