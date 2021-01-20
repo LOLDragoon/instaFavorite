@@ -2,7 +2,14 @@ let data = {} // our default object when there is no one left to delete
 let timer = 30 // our global variable for how long we need to wait, ideally this will be in storage and editable in the future
 const deletion = [] //array of usernames we need to remove from storage
 const now = Date.now() // time upon loading an instagram page
-
+let time = 30;
+let scale = "seconds"
+let timeConversionObj = {
+  seconds: 1000,
+  minutes:60000,
+  hours:3600000,
+  days:86400000,
+}
 
 
 function generateMessage(arr){
@@ -38,8 +45,8 @@ chrome.storage.sync.get(['users'], function(result){
   let message = ''
   data = result.users
     for (const user in data) {
-      if(Math.floor((now-data[user])/1000)>=timer){ //refine for days or minutes or some sort of toggle
-        console.log(`${user} is older than ${timer}, time to delete!`)
+      if(Math.floor((now-data[user].date)/timeConversionObj[data[user].magnitude])>=data[user].amount){ //refine for days or minutes or some sort of toggle
+        console.log(`${user} is older than ${data[user].amount}, time to delete!`)
         deletion.push(user)
         message+= `${user}\n`
         console.log(deletion)
@@ -71,7 +78,9 @@ document.addEventListener('mousedown',function(e){
     // })
     username = e.target.closest('header').querySelector('a').getAttribute("href").slice(1,-1)
     console.log(username)
-    data[username] = Date.now()
+    data[username] = {date:Date.now(),
+                      magnitude: scale,
+                      amount: time}
     console.log(data)
     chrome.storage.sync.set({'users': data}, function(){
     })

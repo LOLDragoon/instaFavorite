@@ -11,7 +11,7 @@
   "content_scripts":[
     {
       "matches": [ "*://*.instagram.com/*"],
-      "js":["main.js","options.js"],
+      "js":["main.js"],
       "css":["style.css"]
     }
   ],

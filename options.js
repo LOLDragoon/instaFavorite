@@ -21,7 +21,7 @@ function save_options() {
 function restore_options() {
   // Use default value color = 'red' and likesColor = true.
   chrome.storage.sync.get({
-    InstaFavoriteTime: 1,
+    InstaFavoriteTime: 60,
     InstaFavoriteScale: "days",
     InstaFavoriteActive: true
   }, function(items) {
