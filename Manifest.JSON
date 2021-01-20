@@ -1,0 +1,15 @@
+{
+  "manifest_version":2,
+  "name" :"favoriteAndForget",
+  "version": "1.0",
+  "description": "Make a reminder to unfollow instagram users after a certain time",
+  "permissions":["storage","activeTab","tabs", "*://*.instagram.com/*"],
+  "content_scripts":[
+    {
+      "matches": [ "*://*.instagram.com/*"],
+      "js":["main.js"],
+      "css":["style.css"]
+    }
+  ],
+  "web_accessible_resources":[]
+}
