@@ -5,6 +5,18 @@ const timeConversionObj = {
   days:86400000,
 }
 
+//testing for a butt ton of followers and to check window behavior
+// const reallyLargeList = {}
+
+// for (let i = 0; i<100; i++){
+//   let testAmount = Math.floor(Math.random()*100)
+//   let testDate = Date.now()
+
+//   reallyLargeList[i] = {date: testDate,
+//                         amount:testAmount,
+//                         magnitude:"days"}
+// }
+
 function save_options() {
   let time = document.getElementById('time').value;
   let scale = document.getElementById('scale').value;
@@ -40,6 +52,9 @@ function restore_options() {
     for (const user in items.users) {
       //let d = new Date(items.users[user].date)
       let timeLeft = items.users[user].amount - Math.floor((Date.now()-items.users[user].date)/timeConversionObj[items.users[user].magnitude])
+      if(timeLeft < 0){
+        timeLeft = 0
+      }
       let newLi = document.createElement("li")
       newLi.innerHTML = `<a href= "https://instagram.com/${user}" target="_blank">${user}</a> in ${timeLeft} ${items.users[user].magnitude}`
       //let text = document.createTextNode(`${user} in ${timeLeft} ${items.users[user].magnitude}`)
