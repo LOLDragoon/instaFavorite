@@ -43,7 +43,6 @@ function generateConfirmation(message,arr)
   click 'Cancel' to keep the users and be reminded later`
   if(confirm(fullMessage)){
     console.log("deleted")
-    navigator.clipboard.writeText(message)
     for(const user in arr){
       //console.log(arr[user])
       delete data[arr[user]]
@@ -79,21 +78,13 @@ function generateList(){
 // THEN open up the other tabs
 
 function openTabs(){
-  // let i = 0
-  // while(i<5)
-  // {
-  //   if (deletion[0]){
-  //     window.open(`https://instagram.com/${deletion[0]}`);
-  //   }
-  //   deletion.shift()
-  //   i++
-  // }
-
+  let message = ''
   // made sure that our data object is cleaned
   for(let i=0; i<displayed.length; i++){
-    
-   delete data[deletion.shift()]
+    message+= `${displayed[i]}\n`
+    delete data[deletion.shift()]
   }
+  navigator.clipboard.writeText(message)
   //console.log(data)
   //load that new data to storage and only upon completion do we start our loading spree
   chrome.storage.sync.set({'users': data}, function(){
@@ -122,16 +113,14 @@ getSettings()
 chrome.storage.sync.get(['users'], function(result){
   console.log("result", result)
   if(result.users){
-  let message = ''
   data = result.users
   //console.log("this is data",data)
     for (const user in data) {
       //individually parses the package of each object to compare if the proper amount of time has passed
       if(Math.floor((now-data[user].date)/timeConversionObj[data[user].magnitude])>=data[user].amount){
-        console.log(`${user} is older than ${data[user].amount}, time to delete!`)
+       // console.log(`${user} is older than ${data[user].amount}, time to delete!`)
         deletion.push(user)
-        message+= `${user}\n`
-        console.log(deletion)
+        //console.log(deletion)
       }
     }
     if(deletion.length>0){
@@ -154,7 +143,7 @@ sidebar.className = "sidebar"
 sidebar.innerHTML = `
 <a href="javascript:void(0)" class="closebtn">&times;</a>
 <div class="choppingBlock">
-  <div class="instructions">Click "Purge" to open tabs of the names currently displayed.\n</div>
+  <div class="instructions">Click "Purge" to copy to clipboard the names currently displayed as well as open tab to their homepage\n</div>
   <ul class ="userList">
   <li class="userName">test</li>
   </ul>
