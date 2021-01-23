@@ -4,6 +4,7 @@ const now = Date.now() // time upon loading an instagram page
 let time = 30;
 let scale = "seconds"
 let active = true
+let displayed = []
 //short hand way to dynamically calculate for the proper unit
 let timeConversionObj = {
   seconds: 1000,
@@ -53,6 +54,66 @@ function generateConfirmation(message,arr)
   }
 }
 
+
+//generates what is displayed on the lefthand tab as well as modify the displayed object
+function generateList(){
+  console.log(deletion)
+  displayed = []
+  let list = ''
+  for (let i = 0; i<5; i++){
+    console.log("we are generating the list from",deletion[i])
+    if(deletion[i]){
+    list += `<li class="userName">${deletion[i]}</li>`
+    displayed.push(deletion[i])
+    }
+  }
+  let remainder = deletion.length-displayed.length
+  console.log("remainder", remainder)
+  list += `<li class="userName"> and ${remainder} other(s)</li>`
+  console.log(list)
+  return list
+}
+
+// has to remove all users from storage so they don't show up on the other tabs
+//update the sidebar with the new names
+// THEN open up the other tabs
+
+function openTabs(){
+  // let i = 0
+  // while(i<5)
+  // {
+  //   if (deletion[0]){
+  //     window.open(`https://instagram.com/${deletion[0]}`);
+  //   }
+  //   deletion.shift()
+  //   i++
+  // }
+
+  // made sure that our data object is cleaned
+  for(let i=0; i<displayed.length; i++){
+    
+   delete data[deletion.shift()]
+  }
+  //console.log(data)
+  //load that new data to storage and only upon completion do we start our loading spree
+  chrome.storage.sync.set({'users': data}, function(){
+    setTimeout(() => { 
+      for(let i=0; i<displayed.length;i++){
+        window.open(`https://instagram.com/${displayed[i]}`);
+      }
+      document.querySelector(".userList").innerHTML= generateList();
+    },0)
+  })
+
+}
+
+function closeSidebar() {
+  document.getElementById("mySideBar").style.width = "0";
+  document.getElementById("main").style.marginLeft = "0";
+}
+
+
+
 //acquire settings from options
 getSettings()
 
@@ -63,6 +124,7 @@ chrome.storage.sync.get(['users'], function(result){
   if(result.users){
   let message = ''
   data = result.users
+  //console.log("this is data",data)
     for (const user in data) {
       //individually parses the package of each object to compare if the proper amount of time has passed
       if(Math.floor((now-data[user].date)/timeConversionObj[data[user].magnitude])>=data[user].amount){
@@ -73,11 +135,39 @@ chrome.storage.sync.get(['users'], function(result){
       }
     }
     if(deletion.length>0){
-      generateConfirmation(message,deletion)
+      document.querySelector(".userList").innerHTML= generateList()
+      document.getElementById("mySideBar").style.width = "250px";
+      document.getElementById("main").style.marginLeft = "250px";
+      //generateConfirmation(message,deletion)
     }
   }
   //console.log(data)
 })
+
+
+
+// dom injection junk
+let sidebar= document.createElement("div")
+sidebar.id = "mySideBar"
+sidebar.className = "sidebar"
+
+sidebar.innerHTML = `
+<a href="javascript:void(0)" class="closebtn">&times;</a>
+<div class="choppingBlock">
+  <div class="instructions">Click "Purge" to open tabs of the names currently displayed.\n</div>
+  <ul class ="userList">
+  <li class="userName">test</li>
+  </ul>
+  <button class="purgeButton">Purge</button>
+</div>
+<br>
+<div class="instructions">You can see the full list of your followed users from the options page</div>`
+ let body = document.getElementsByTagName("body")
+ body[0].prepend(sidebar)
+
+
+document.querySelector(".purgeButton").addEventListener("click",openTabs)
+document.querySelector(".closebtn").addEventListener("click",closeSidebar)
 
 
 document.addEventListener('mousedown',function(e){
